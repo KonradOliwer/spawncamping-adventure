@@ -11,3 +11,11 @@
 *.lai
 *.la
 *.a
+
+.dep.inc
+Makefile
+.gitignore
+nbproject/
+dist/
+build/
+

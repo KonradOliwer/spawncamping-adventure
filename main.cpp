@@ -62,7 +62,7 @@ public:
         return child;
     }
 
-    vector<Point> unpackToStack(vector<State> &stack, vector<bool> &fine_points) {
+    void unpackToStack(vector<State> &stack, vector<bool> &fine_points) {
         for (int i = 0; i < board.size(); i++) {
             if (fine_points.at((position + 1) * board.size() + i)) {
                 stack.push_back(getChild(i));

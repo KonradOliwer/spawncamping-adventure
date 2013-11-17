@@ -20,6 +20,28 @@ public:
         board[position] = value;
     }
 
+    State(int size, int *data) {
+        board.reserve(size);
+        int i = -1;
+        while (++i < size) {
+            board.push_back(data[i]);
+        }
+        position = data[i];
+    }
+
+    void serialize(int *data) {
+        int i = -1;
+        while (++i < board.size()) {
+            data[i] = board[i];
+        }
+        data[i] = position;
+    }
+
+    static int dataSize(int size)
+    {
+        return size + 1; // board + position
+    }
+
     void print() {
         cout << "[";
         for (int i = 0; i < board.size(); i++) {

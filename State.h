@@ -37,8 +37,7 @@ public:
 
     bool is_valid() {
         for (int i = 0; i < position; i++) {
-            if (!(board[position] != board[i]
-                    && abs(position - i) != abs(board[position] - board[i]))) {
+            if (board[position] == board[i] || position - i == abs(board[position] - board[i])) {
                 return false;
             }
         }

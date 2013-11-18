@@ -3,6 +3,8 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <vector>
 
 using namespace std;
@@ -52,17 +54,21 @@ public:
         return size + 1; // board + position
     }
 
-    void print()
+    string str()
     {
-        cout << "[";
+        stringstream s;
+
+        s << '[';
 
         for (int i = 0; i < board.size(); i++) {
-            cout << board[i] + 1;
+            s << board[i] + 1;
             if (i < board.size() - 1)
-                cout << ",";
+                s << ',';
         }
 
-        cout << "]" << endl;
+        s << ']';
+
+        return s.str();
     }
 
     bool isLeaf()

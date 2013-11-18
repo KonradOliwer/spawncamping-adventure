@@ -169,7 +169,7 @@ class ParallelSolver : public Solver
 
         if (current.isValid()) {
             if (current.isLeaf()) {
-                current.print();
+                cout << sgr("32") << "Solution: " << current.str() << sgr() << endl;
                 terminator->broadcastDeath();
             } else {
                 current.unpackToStack(stack, fine_points);

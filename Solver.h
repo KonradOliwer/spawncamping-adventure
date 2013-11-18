@@ -49,11 +49,11 @@ public:
             stack.pop_back();
 
             if (current.isValid()) {
-                if (!current.isLeaf()) {
-                    current.unpackToStack(stack, fine_points);
-                } else {
-                    current.print();
+                if (current.isLeaf()) {
+                    cout << sgr("32") << "Solution: " << current.str() << sgr() << endl;
                     return true;
+                } else {
+                    current.unpackToStack(stack, fine_points);
                 }
             }
         }

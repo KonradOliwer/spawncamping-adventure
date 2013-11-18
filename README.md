@@ -1,5 +1,5 @@
 spawncamping-adventure
 ======================
-Już się przynajmniej kompiluje. ;)
+Jak zacząłem dogłębniej analizować multi.cpp, to doszedłem do wniosku, że praktycznie wszystko jest źle i napisałem od nowa (Terminator.h).
 
-Wymiana zadań jest na razie w gałęzi work-exchange-demo, bo połączenie tego w całość chwilkę może zająć.
+Program już jako-tako działa (przynajmniej na moim laptopie, Halite nieco się różni). Raz się zdarzyło, że się zapętlił.

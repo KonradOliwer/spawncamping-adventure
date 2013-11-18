@@ -33,11 +33,20 @@ public:
 
         fine_points = vector<bool>(size * size, true);
 
-        while (f.good()) {
+        while (true) {
             int x, y;
             f >> x >> y;
-            fine_points[((x - 1) * size + (y - 1))] = false;
+            if (f.fail()) {
+                break;
+            } else {
+                fine_points[((x - 1) * size + (y - 1))] = false;
+            }
         }
+    }
+
+    int getSize()
+    {
+        return size;
     }
 
     virtual bool solve()
@@ -50,16 +59,18 @@ public:
 
             if (current.isValid()) {
                 if (current.isLeaf()) {
-                    cout << sgr("32") << "Solution: " << current.str() << sgr() << endl;
+#ifndef QUIET
+                    cout << sgr("32")  << 0 << ": Solution: " << current.str() << sgr() << endl;
+#endif
                     return true;
                 } else {
                     current.unpackToStack(stack, fine_points);
                 }
             }
         }
-
-        cout << "There is no possible solution for " << size << "-queen problem defined in: "
-             << FILE_NAME << endl;
+#ifndef QUIET
+        cout << sgr("32") << 0 << ": Solution: n/a" << sgr() << endl;
+#endif
 
         return false;
     }

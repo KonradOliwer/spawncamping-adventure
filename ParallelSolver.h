@@ -19,17 +19,37 @@ class ParallelSolver : public Solver
     int rank;
     int comm_size;
 
+    int rrCurrent;
+
     Terminator *terminator;
+
+    int choosePeerRand()
+    {
+        return (rank + 1 + rand() % (comm_size-1)) % comm_size;
+    }
+
+    int choosePeerRR()
+    {
+        rrCurrent = (rrCurrent+1) % comm_size;
+
+        return rrCurrent == rank ? choosePeerRR() : rrCurrent;
+    }
 
     int choosePeer()
     {
-        return (rank + 1 + rand() % (comm_size-1)) % comm_size;
+#ifdef RRPEER
+        return choosePeerRR();
+#else
+        return choosePeerRand();
+#endif
     }
 
     // Handle one incoming request, if there are any
     void handleWorkRequest()
     {
+#ifdef DEBUG
         cout << sgr("34") << rank << ": Handling requests" << sgr() << endl;
+#endif
 
         int msg_flag;
         MPI_Status status;
@@ -38,7 +58,9 @@ class ParallelSolver : public Solver
 
         // Check whether there is a pending requst
         if (msg_flag) {
+#ifdef DEBUG
             cout << rank << ": Receiving request from " << status.MPI_SOURCE << ", stack size is " << stack.size() << endl;
+#endif
 
             // Acknowledge the request
             MPI_Recv(NULL, 0, MPI_INT, status.MPI_SOURCE, WORK_REQUEST_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
@@ -60,7 +82,9 @@ class ParallelSolver : public Solver
                     data += data_size;
                 }
 
+#ifdef DEBUG
                 cout << rank << ": Sending work (" << state_count << ") to " << status.MPI_SOURCE << endl;
+#endif
 
                 // Respond with some serialized work
                 MPI_Send(send_buf, send_size, MPI_INT, status.MPI_SOURCE, WORK_RESPONSE_TAG, MPI_COMM_WORLD);
@@ -71,7 +95,9 @@ class ParallelSolver : public Solver
                 // Clean up
                 delete[] send_buf;
             } else {
+#ifdef DEBUG
                 cout << rank << ": Sending negative response to " << status.MPI_SOURCE << endl;
+#endif
 
                 // Not enough work, send a negative response
                 MPI_Send(NULL, 0, MPI_INT, status.MPI_SOURCE, WORK_RESPONSE_TAG, MPI_COMM_WORLD);
@@ -85,7 +111,9 @@ class ParallelSolver : public Solver
         // Choose someone to cummunicate with
         const int peer = choosePeer();
 
+#ifdef DEBUG
         cout << sgr("33") << rank << ": Asking " << peer << " for work" << sgr() << endl;
+#endif
 
         // Send a request for work
         MPI_Request request;
@@ -96,7 +124,9 @@ class ParallelSolver : public Solver
         MPI_Status status;
 
         while (true) {
+#ifdef DEBUG
             cout << rank << ": Waiting for response from " << peer << endl;
+#endif
 
             // There is a chance that the peer died and will not respond
             if (terminator->checkDeath())
@@ -122,7 +152,9 @@ class ParallelSolver : public Solver
                     const int state_count = recv_size / data_size;
                     stack.reserve(state_count);
 
+#ifdef DEBUG
                     cout << sgr("32") << rank << ": Positive response from " << peer << " (" << state_count << ")" << sgr() << endl;
+#endif
 
                     // Deserialize the work
                     for (int *data = recv_buf, i = 0; i < state_count; i++) {
@@ -137,7 +169,9 @@ class ParallelSolver : public Solver
                     // Notify about the success
                     return true;
                 } else {
+#ifdef DEBUG
                     cout << sgr("31") << rank << ": Negative response from " << peer << sgr() << endl;
+#endif
 
                     // Clean up
                     MPI_Wait(&request, MPI_STATUS_IGNORE);
@@ -156,7 +190,9 @@ class ParallelSolver : public Solver
 
     void processWork()
     {
+#ifdef DEBUG
         cout << sgr("34") << rank << ": Working" << sgr() << endl;
+#endif
 
         /* Dummy work *********************************************************/
 
@@ -169,7 +205,9 @@ class ParallelSolver : public Solver
 
         if (current.isValid()) {
             if (current.isLeaf()) {
-                cout << sgr("32") << "Solution: " << current.str() << sgr() << endl;
+#ifndef QUIET
+                cout << sgr("32") << rank << ": Solution: " << current.str() << sgr() << endl;
+#endif
                 terminator->broadcastDeath();
             } else {
                 current.unpackToStack(stack, fine_points);
@@ -179,8 +217,10 @@ class ParallelSolver : public Solver
 
     void mainLoop()
     {
-        while (true) {
+        while (!terminator->checkDeath()) {
+#ifdef DEBUG
             cout << sgr("35") << rank << ": I have " << stack.size() << " tasks" << sgr() << endl;
+#endif
 
             if (stack.empty()) {
                 bool more_work = requestWork();
@@ -203,11 +243,15 @@ class ParallelSolver : public Solver
 
 public:
 
-    ParallelSolver(const string &file_name) : Solver(file_name)
+    ParallelSolver(const string &file_name) :
+        Solver(file_name)
     {
         MPI_Comm_rank(MPI_COMM_WORLD, &rank);
         MPI_Comm_size(MPI_COMM_WORLD, &comm_size);
+
         srand(time(NULL) + rank*123);
+
+        rrCurrent = rank;
 
         terminator = new Terminator(rank, comm_size);
     }
@@ -219,20 +263,25 @@ public:
 
     bool solve()
     {
-        cout << sgr("36") << rank << ": Parallel dummy starting " << sgr() << endl;
+#ifdef DEBUG
+        cout << sgr("36") << rank << ": Parallel solver starting " << sgr() << endl;
+#endif
 
-        // Push some dummy states
         if (rank == 0) {
+            /* Dummy work *****************************************************/
             /*for (int i = 0; i < 40; i++) {
                 stack.push_back(State(size, -1));
             }*/
 
+            /* Real work *******************************************************/
             stack.push_back(State(size, -1));
         }
 
         mainLoop();
 
-        cout << sgr("36") << rank << ": Parallel dummy finished" << sgr() << endl;
+#ifdef DEBUG
+        cout << sgr("36") << rank << ": Parallel solver finished" << sgr() << endl;
+#endif
     }
 };
 

@@ -32,7 +32,9 @@ class Terminator
         // Determine the detination
         const int successor = (rank+1) % comm_size;
 
+#ifdef DEBUG
         cout << sgr("35") << rank << ": Passing token to " << successor << sgr() << endl;
+#endif
 
         // Clean up after the previous transmission
         if (token_buf != -1)
@@ -54,13 +56,17 @@ public:
         token_initialized(false),
         finished(false)
     {
+#ifdef DEBUG
         cout << sgr("36") << rank << ": Terminator initialzed" << sgr() << endl;
+#endif
     }
 
     // Tell everyone to die, blocking
     void broadcastDeath()
     {
+#ifdef DEBUG
         cout << sgr("35") << rank << ": Telling everone to die" << sgr() << endl;
+#endif
 
         finished = true;
 
@@ -68,8 +74,6 @@ public:
 
         for (int i = 0; i < comm_size; i++)
             MPI_Send(NULL, 0, MPI_INT, i, DEATH_TAG, MPI_COMM_WORLD);
-
-        // TODO: Nonblocking send?
     }
 
     // Check for the termination message
@@ -93,23 +97,31 @@ public:
     void onWorkSent(int dst)
     {
         if (dst < rank) {
+#ifdef DEBUG
             cout << sgr("35") << rank << ": " << "Work sent, I am black now" << endl;
+#endif
 
             color = BLACK;
         }
 
+#ifdef DEBUG
         cout << sgr("35") << rank << ": " << "Work sent, no change in color" << sgr() << endl;
+#endif
     }
 
     // Call whenever unable to get any more work
     bool onIdle()
     {
         if (finished) {
+#ifdef DEBUG
             cout << rank << ": Idle and finished" << endl;
+#endif
 
             return false;
         } else {
+#ifdef DEBUG
             cout << rank << ": Idle and waiting" << endl;
+#endif
 
             if (rank != 0 && checkDeath())
                 return false;
@@ -135,6 +147,10 @@ public:
                     if (rank == 0) {
                         // Check the termination condition
                         if (token == WHITE) {
+#ifndef QUIET
+                            cout << sgr("32") << rank << ": Solution: n/a" << sgr() << endl;
+#endif
+
                             broadcastDeath();
                             return false;
                         } else {

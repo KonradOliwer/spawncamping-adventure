@@ -167,8 +167,8 @@ class ParallelSolver : public Solver
         State current = stack.back();
         stack.pop_back();
 
-        if (current.is_valid()) {
-            if (current.is_last()) {
+        if (current.isValid()) {
+            if (current.isLeaf()) {
                 current.print();
                 terminator->broadcastDeath();
             } else {
@@ -202,6 +202,7 @@ class ParallelSolver : public Solver
     }
 
 public:
+
     ParallelSolver(const string &file_name) : Solver(file_name)
     {
         MPI_Comm_rank(MPI_COMM_WORLD, &rank);

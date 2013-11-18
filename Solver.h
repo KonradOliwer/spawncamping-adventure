@@ -9,8 +9,8 @@
 
 using namespace std;
 
-class Solver {
-
+class Solver
+{
 protected:
 
     const string FILE_NAME;
@@ -21,15 +21,18 @@ protected:
 
 public:
 
-    Solver(const string &file_name) : FILE_NAME(file_name) {
+    Solver(const string &file_name) : FILE_NAME(file_name)
+    {
         ifstream f(file_name.c_str());
 
         string content;
+
         f >> content;
         f >> size;
         f >> content;
 
         fine_points = vector<bool>(size * size, true);
+
         while (f.good()) {
             int x, y;
             f >> x >> y;
@@ -37,14 +40,16 @@ public:
         }
     }
 
-    virtual bool solve() {
+    virtual bool solve()
+    {
         stack.push_back(State(size, -1));
 
         while (stack.size() > 0) {
             State current = stack.back();
             stack.pop_back();
-            if (current.is_valid()) {
-                if (!current.is_last()) {
+
+            if (current.isValid()) {
+                if (!current.isLeaf()) {
                     current.unpackToStack(stack, fine_points);
                 } else {
                     current.print();

@@ -46,6 +46,7 @@ class Terminator
     }
 
 public:
+
     Terminator(int rank, int comm_size) :
         rank(rank),
         comm_size(comm_size),
@@ -110,9 +111,8 @@ public:
         } else {
             cout << rank << ": Idle and waiting" << endl;
 
-            if (rank != 0 && checkDeath()) {
+            if (rank != 0 && checkDeath())
                 return false;
-            }
 
             if (rank == 0 && !token_initialized) {
                 // Initialize the token

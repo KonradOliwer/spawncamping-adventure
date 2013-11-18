@@ -78,7 +78,7 @@ public:
         int msg_flag;
         MPI_Status status;
 
-        MPI_Iprobe(0, DEATH_TAG, MPI_COMM_WORLD, &msg_flag, &status);
+        MPI_Iprobe(MPI_ANY_SOURCE, DEATH_TAG, MPI_COMM_WORLD, &msg_flag, &status);
 
         if (msg_flag) {
             MPI_Recv(NULL, 0, MPI_INT, status.MPI_SOURCE, DEATH_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);

@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
     int comm_size;
     MPI_Comm_size(MPI_COMM_WORLD, &comm_size);
 
-    const string FILE_NAME = argc > 1 ? argv[1] : "queen4";
+    const string FILE_NAME = argc > 1 ? argv[1] : "queen6-bad";
 
     comm_size > 1 ? ParallelSolver(FILE_NAME).solve()
                   : Solver(FILE_NAME).solve();

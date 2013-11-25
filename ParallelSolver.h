@@ -261,7 +261,7 @@ public:
         delete terminator;
     }
 
-    bool solve()
+    void solve()
     {
 #ifdef DEBUG
         cout << sgr("36") << rank << ": Parallel solver starting " << sgr() << endl;

@@ -49,7 +49,7 @@ public:
         return size;
     }
 
-    virtual bool solve()
+    virtual void solve()
     {
         stack.push_back(State(size, -1));
 
@@ -62,7 +62,7 @@ public:
 #ifndef QUIET
                     cout << sgr("32")  << 0 << ": Solution: " << current.str() << sgr() << endl;
 #endif
-                    return true;
+                    return;
                 } else {
                     current.unpackToStack(stack, fine_points);
                 }
@@ -72,7 +72,7 @@ public:
         cout << sgr("32") << 0 << ": Solution: n/a" << sgr() << endl;
 #endif
 
-        return false;
+        return;
     }
 };
 

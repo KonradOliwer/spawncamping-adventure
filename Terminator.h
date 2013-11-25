@@ -73,7 +73,8 @@ public:
         MPI_Request request;
 
         for (int i = 0; i < comm_size; i++)
-            MPI_Send(NULL, 0, MPI_INT, i, DEATH_TAG, MPI_COMM_WORLD);
+            if (i != rank)
+                MPI_Isend(NULL, 0, MPI_INT, i, DEATH_TAG, MPI_COMM_WORLD, &request);
     }
 
     // Check for the termination message

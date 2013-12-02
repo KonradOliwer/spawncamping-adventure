@@ -231,7 +231,8 @@ class ParallelSolver : public Solver
                     return;
             } else {
                 // Do some work
-                processWork();
+                for (int i = 0; i < 1000 && !stack.empty(); i++)
+                    processWork();
             }
 
             // Process requests from other nodes
